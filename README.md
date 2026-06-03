@@ -4,6 +4,10 @@ Prompt Builder is a terminal application that allows you to visually design, pre
 
 Instead of manually editing `PS1` or `PROMPT` variables, Prompt Builder provides an interactive interface for assembling prompt components, customizing colors and styles, and previewing the final result in real time.
 
+## Demo
+
+![Demo of the app](./images/demo.png)
+
 ## Features
 
 * Interactive prompt editor
@@ -92,7 +96,3 @@ Prompt Builder is built using Textual:
 https://github.com/Textualize/textual
 
 Textual provides a modern framework for building rich terminal user interfaces in Python.
-
-## License
-
-MIT License
