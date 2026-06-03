@@ -1,6 +1,7 @@
 """LivePreviewPanel — live prompt preview with virtual terminal simulation."""
 from __future__ import annotations
 
+import re
 import datetime
 from pathlib import Path
 
@@ -36,7 +37,6 @@ _DEFAULT_RC: dict[str, Path] = {
 # Fake terminal lines shown above the live prompt
 _FAKE_HISTORY = [
     ("dim", "Last login: {} on pts/0".format(datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y"))),
-    ("dim", ""),
 ]
 
 class LivePreviewPanel(Widget):
@@ -109,11 +109,11 @@ class LivePreviewPanel(Widget):
     def _update_validation(self) -> None:
         badge = self.query_one("#validation-badge", Label)
         if self._shell == "bash":
-            badge.update("✓ Bash PS1")
+            badge.update("✓ Bash PS1 (Support var like '\\\\u')")
         elif self._shell == "zsh":
-            badge.update("✓ Zsh PROMPT")
+            badge.update("✓ Zsh PROMPT (Support var like '%n')")
         else:
-            badge.update(f"Shell: {self._shell}")
+            badge.update(f"{self._shell.capitalize()}")
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         bid = event.button.id
@@ -136,13 +136,27 @@ class LivePreviewPanel(Widget):
 
     def save_to_bashrc(self, path: Path = _DEFAULT_RC["bash"]) -> None:
         try:
+            begin = "##### BEGIN prompt builder"
+            end = "##### END prompt builder"
+
+            bloc = begin + "\n"
+            bloc += self._last_export + "\n"
+            bloc += end + "\n"
+
+            contenu = path.read_text()
+
+            pattern = re.compile(
+                rf"{re.escape(begin)}.*?{re.escape(end)}",
+                re.DOTALL
+            )
+
             path.parent.mkdir(parents=True, exist_ok=True)
-            with open(path, "a") as f:
-                shell_name = self._shell.capitalize()
-                f.write(
-                    f"\n# Added by Bash Prompt Builder ({shell_name})\n"
-                    f"{self._last_export}\n"
-                )
+            if pattern.search(contenu):
+                contenu = pattern.sub(lambda x : bloc, contenu)
+            else:
+                contenu += f"\n\n{bloc}\n"
+            path.write_text(contenu)
             self.notify(f"Saved to {path}", severity="information")
         except Exception as exc:
             self.notify(f"Save failed: {exc}", severity="error")
+            self.notify(f"{self._last_export}", severity="error")
