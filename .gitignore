@@ -3,3 +3,4 @@ test.py
 tests/
 .venv/
 venv/
+prompt_builder.egg-info/

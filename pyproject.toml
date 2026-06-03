@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 authors = [
-  {name: "RIOUX Guilhem" }
+  {name = "RIOUX Guilhem" }
 ]
 
 [project.scripts]
