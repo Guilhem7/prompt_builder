@@ -1,0 +1,294 @@
+/* =========================================================
+   Bash Prompt Builder — Textual CSS
+   ========================================================= */
+
+Screen { layout: vertical; }
+
+#app-container {
+    layout: horizontal;
+    height: 1fr;
+}
+
+#left-panel {
+    width: 36;
+    min-width: 30;
+    border-right: solid $primary-darken-2;
+    layout: vertical;
+    background: $surface;
+}
+
+#toolbar {
+    height: auto;
+    padding: 1 1 0 1;
+    layout: horizontal;
+    background: $surface-darken-1;
+    border-bottom: solid $primary-darken-3;
+}
+
+#toolbar2 {
+    height: auto;
+    padding: 0 1 1 1;
+    layout: horizontal;
+    background: $surface-darken-1;
+    border-bottom: solid $primary-darken-3;
+}
+
+#seg-type-select { width: 1fr; }
+#btn-add         { margin-left: 1; min-width: 7; }
+#theme-select    { width: 1fr; }
+#preset-select   { width: 1fr; margin-left: 1; }
+
+#segment-list {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+SegmentListPanel {
+    height: auto;
+    layout: vertical;
+}
+
+SegmentRow {
+    height: 3;
+    layout: horizontal;
+    align: left middle;
+    /*padding: 0 1;*/
+    border-bottom: dashed $surface-darken-1;
+}
+
+SegmentRow:hover          { background: $surface-darken-1; }
+SegmentRow.selected       { background: $primary-darken-2; border-left: thick $primary; }
+
+.seg-icon  { width: 4; color: $text-muted; }
+.seg-label { width: 1fr; overflow: hidden; text-overflow: ellipsis; }
+
+.del-background {
+    padding-left: 1;
+}
+
+.btn-transparent {
+    max-width: 5;
+    background: transparent;
+    border: none;
+    height: 1fr;
+}
+
+.row-btn {
+    min-width: 3;
+    width: 3;
+    height: 1;
+    border: none;
+    background: transparent;
+    color: $text-muted;
+}
+.row-btn:hover       { color: $primary; background: transparent; }
+.del:hover   { color: $error; }
+.clone:hover { color: $success; }
+
+/* ── Right panel ────────────────────────────────────────── */
+
+#right-panel {
+    width: 1fr;
+    layout: vertical;
+    background: $background;
+}
+
+SegmentConfigPanel {
+    height: 22;
+    border-bottom: solid $primary-darken-2;
+    padding: 1 2;
+    layout: vertical;
+    background: $surface;
+}
+
+#custom-text        { max-width: 25; min-width: 25; }
+
+#config-title      { text-style: bold; color: $primary-lighten-1; margin-bottom: 1; }
+#config-empty-hint { color: $text-muted; text-style: italic; }
+
+/*.config-row {
+    height: auto;
+    layout: horizontal;
+    width: 100%;
+    align: left middle;
+    margin-bottom: 1;
+}
+*/
+.config-row > * {
+    height: 3;
+    content-align: left middle;
+}
+
+.config-label {
+    width: auto;
+    color: $text-muted;
+    content-align: left middle;
+    height: 3;
+    padding-right: 2;
+}
+
+/* ── Color picker ───────────────────────────────────────── */
+
+ColorPickerCompact {
+    layout: horizontal;
+    height: 1;
+    align: left middle;
+}
+
+#swatch      { width: 4; height: 1; content-align: center middle; }
+#swatch:hover      { hatch: right $warning 60%; text-style: underline; pointer: pointer; }
+#color-input { width: 5; margin-left: 1; }
+#hex-input   { width: 9; margin-left: 1; }
+
+/* ── Contrast badge ─────────────────────────────────────── */
+
+#contrast-badge  { color: $text-muted; }
+.contrast-good   { color: $success; }
+.contrast-ok     { color: $warning; }
+.contrast-bad    { color: $error; }
+
+/* ── Separator selector ─────────────────────────────────── */
+
+.sep-btn {
+    min-width: 4;
+    height: 100%;
+    border: none;
+    background: $surface-darken-1;
+    margin-right: 1;
+    padding: 0 1;
+}
+
+.sep-btn.active { background: $primary; color: $text; text-style: bold; }
+
+/* ── Custom text / content override ────────────────────── */
+
+#custom-text {
+    width: 1fr;
+    border: solid $primary-darken-2;
+}
+
+#custom-text:focus {
+    border: solid $primary;
+}
+
+#icon-toggle { margin-left: 0; }
+
+/* ── Live preview panel ─────────────────────────────────── */
+
+LivePreviewPanel {
+    height: 1fr;
+    padding: 1 2;
+    layout: vertical;
+    background: $background;
+}
+
+#preview-header {
+    layout: horizontal;
+    height: auto;
+    margin-bottom: 1;
+    align: left middle;
+}
+
+#preview-title { text-style: bold; color: $primary-lighten-1; width: 1fr; }
+#shell-select  { width: 20; }
+
+/* Virtual terminal box */
+#vterm-box {
+    height: 7;
+    background: $surface-darken-3;
+    border: solid $primary-darken-1;
+    padding: 0 1;
+    layout: vertical;
+    margin-bottom: 1;
+}
+
+#vterm-history {
+    height: 2;
+    color: $text-muted;
+}
+
+#vterm-prompt-row {
+    layout: horizontal;
+    height: 2;
+    align: left middle;
+}
+
+#ansi-preview {
+    height: auto;
+    width: 1fr;
+    content-align: left middle;
+}
+
+#vterm-cursor {
+    width: 1;
+    height: 1;
+    color: $text;
+    text-style: blink bold;
+}
+
+/* Status bar */
+#preview-meta {
+    layout: horizontal;
+    height: 1;
+    align: left middle;
+    margin-bottom: 1;
+}
+
+#validation-badge { width: 1fr; }
+.badge-valid   { color: $success; }
+.badge-invalid { color: $error; }
+
+#width-indicator { color: $text-muted; text-align: right; }
+.width-warning   { color: $warning; }
+.width-ok        { color: $text-muted; }
+
+/* Export string */
+#ps1-label { color: $text-muted; text-style: italic; }
+
+#ps1-raw {
+    height: auto;
+    max-height: 6;
+    background: $surface-darken-3;
+    border: dashed $primary-darken-3;
+    padding: 0 1;
+    color: $text-muted;
+    overflow-x: auto;
+    margin-top: 0;
+    margin-bottom: 1;
+}
+
+#preview-actions {
+    layout: horizontal;
+    height: auto;
+    align: center middle;
+}
+
+#btn-copy { margin-right: 1; }
+#btn-save { margin-right: 1; }
+
+PaletteScreen { align: center middle; }
+
+#palette-dialog {
+    width: 70;
+    height: auto;
+    border: solid $primary;
+    background: $surface;
+    padding: 1 2;
+    layout: vertical;
+}
+
+#palette-title       { text-style: bold; color: $primary-lighten-1; margin-bottom: 1; }
+
+PaletteGrid          { height: 8; width: 64; border: solid $surface-darken-1; }
+
+#palette-selected-label { height: 1; margin-top: 1; color: $text-muted; }
+#palette-hex-row        { layout: horizontal; height: auto; margin-top: 1; align: left middle; }
+#palette-hex-label      { width: 12; color: $text-muted; }
+#palette-hex-input      { width: 22; }
+#palette-hex-apply      { margin-left: 1; min-width: 8; }
+#color-hex-input        { width: 5; height: 3;}
+#palette-actions     { layout: horizontal; height: auto; margin-top: 1; }
+#btn-palette-ok      { margin-right: 1; }
+
+Header { background: $primary-darken-3; }
+Footer { background: $surface-darken-2; }
