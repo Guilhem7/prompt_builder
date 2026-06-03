@@ -1,26 +1,25 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "prompt-builder"
 version = "0.1.0"
-description = "Interactive TUI for building custom Bash PS1 prompts"
+description = "Interactive TUI for building custom shell prompts"
 requires-python = ">=3.10"
+
 dependencies = [
     "textual>=0.55.0",
     "pyperclip>=1.8.2",
 ]
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0",
-    "pytest-asyncio>=0.23",
+authors = [
+  {name: "RIOUX Guilhem" }
 ]
 
 [project.scripts]
 prompt-builder = "prompt_builder.__main__:main"
 
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-testpaths = ["tests"]
+[tool.setuptools]
+packages = ["prompt_builder"]
+
