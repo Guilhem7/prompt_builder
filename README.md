@@ -56,6 +56,14 @@ cd prompt-builder
 pip install -e .
 ```
 
+```bash
+git clone <repository-url>
+cd prompt-builder
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python3 -m prompt_builder
+```
+
 ## Usage
 
 Launch the application:
@@ -96,3 +104,10 @@ Prompt Builder is built using Textual:
 https://github.com/Textualize/textual
 
 Textual provides a modern framework for building rich terminal user interfaces in Python.
+
+## TODO
+
+- Take terminal background in use
+- Add config for bash and zsh variables that could be interpolated
+- Also add function that could be interpolated such as `_git_branch`
+
