@@ -42,10 +42,12 @@ _FAKE_HISTORY = [
 class LivePreviewPanel(Widget):
     """Shows live prompt preview in a virtual terminal + export string."""
 
-    def __init__(self) -> None:
+    def __init__(self, shell) -> None:
+        if shell is None:
+            shell = "bash"
         super().__init__()
         self._last_export: str = 'export PS1="$ "'
-        self._shell: str = "bash"
+        self._shell: str = shell
         self._segments: list = SegmentsList([])
 
     def compose(self) -> ComposeResult:
@@ -55,7 +57,7 @@ class LivePreviewPanel(Widget):
             yield Select(
                 _SHELL_OPTIONS,
                 id="shell-select",
-                value="bash",
+                value=self._shell,
                 allow_blank=False,
             )
         # Virtual terminal
@@ -82,6 +84,7 @@ class LivePreviewPanel(Widget):
         if event.value and event.value is not Select.BLANK:
             self._shell = str(event.value)
             self._refresh(self._segments)
+            self.app.autosave()
 
     def on_segments_changed(self, msg: SegmentsChanged) -> None:
         self._segments = msg.segments
@@ -89,7 +92,6 @@ class LivePreviewPanel(Widget):
 
     def _refresh(self, segs: list) -> None:
         self._update_vterm(segs)
-        # export_str = build_for_shell(segs, self._shell)
         export_str = format_segments(segs, self._shell)
         self._last_export = export_str
         self.query_one("#ps1-raw", Static).update(export_str)

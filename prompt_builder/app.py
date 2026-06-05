@@ -46,12 +46,11 @@ class PromptBuilderApp(App):
     def __init__(self) -> None:
         super().__init__()
 
-        saved = load_session()
+        saved, self._init_shell = load_session()
         if saved:
             self._segments = saved
         else:
             self._segments = get_default_segments()
-
         self._selected_id = None
 
     def compose(self) -> ComposeResult:
@@ -74,11 +73,18 @@ class PromptBuilderApp(App):
                     yield SegmentListPanel(self._segments)
             with Vertical(id="right-panel"):
                 yield SegmentConfigPanel()
-                yield LivePreviewPanel()
+                yield LivePreviewPanel(self._init_shell)
         yield Footer()
 
     def on_mount(self) -> None:
         self.reload_segments(self._segments)
+
+    def autosave(self):
+        try:
+            shell = self.query_one(LivePreviewPanel)._shell
+            save_session(self._segments, shell)
+        except Exception as exc:
+            pass
 
     def reload_segments(
         self,
@@ -94,18 +100,12 @@ class PromptBuilderApp(App):
                 pass
 
         # Auto-save session on every change
-        try:
-            save_session(self._segments)
-        except Exception:
-            pass
+        self.autosave()
 
     def update_segment_field(self, segment_id: str, field: str, value: object) -> None:
         """Mutate one field in-place (preserves segment IDs) then broadcast."""
         self._segments.update(segment_id, field, value)
-        if field == "text":
-            self.reload_segments(True)
-        else:
-            self.reload_segments()
+        self.reload_segments(field == "text")
 
     def on_segment_added(self, msg: SegmentAdded) -> None:
         new_seg = make_segment(msg.segment_type)

@@ -15,6 +15,9 @@ from prompt_builder.models import SegmentsList, Segment, SegmentType, SeparatorS
 CONFIG_DIR = Path("~/.config/prompt-builder").expanduser()
 _AUTOSAVE_NAME = "__autosave__"
 
+_SHELL_KEY = "shell"
+_SEGMENTS_KEY = "segments"
+
 def segment_to_dict(seg: Segment) -> dict[str, Any]:
     return {
         "type":       seg.type.value,
@@ -33,20 +36,23 @@ def segment_from_dict(d: dict[str, Any]) -> Segment:
         style=Style.parse(d["style"])
     )
 
-def save_profile(name: str, segment_list) -> None:
+def save_profile(name: str, segment_list, shell="bash") -> None:
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     data = [segment_to_dict(s) for s in segment_list.segments]
-    (CONFIG_DIR / f"{name}.json").write_text(json.dumps(data, indent=2))
+    datas = {_SHELL_KEY: shell.lower(), _SEGMENTS_KEY: data}
+    (CONFIG_DIR / f"{name}.json").write_text(json.dumps(datas, indent=2))
 
 def load_profile(name: str):
     path = CONFIG_DIR / f"{name}.json"
     if not path.exists():
         return None
     try:
-        data = json.loads(path.read_text())
-        return SegmentsList(segments=[segment_from_dict(d) for d in data])
+        datas = json.loads(path.read_text())
+        data = datas[_SEGMENTS_KEY]
+        shell = datas[_SHELL_KEY]
+        return SegmentsList(segments=[segment_from_dict(d) for d in data]), shell
     except Exception:
-        return None
+        return None, None
 
 def delete_profile(name: str) -> bool:
     path = CONFIG_DIR / f"{name}.json"
@@ -63,8 +69,8 @@ def list_profiles() -> list[str]:
         if p.stem != _AUTOSAVE_NAME
     )
 
-def save_session(segments: list[Segment]) -> None:
-    save_profile(_AUTOSAVE_NAME, segments)
+def save_session(segments: list[Segment], shell="bash") -> None:
+    save_profile(_AUTOSAVE_NAME, segments, shell)
 
 def load_session() -> list[Segment] | None:
     return load_profile(_AUTOSAVE_NAME)
@@ -76,12 +82,6 @@ BUILTIN_PRESETS: dict[str, SegmentsList] = {
     "Simple": SegmentsList(segments=[
         _p(SegmentType.CUSTOM, text=r"\\w ", separator=SeparatorStyle.NONE, color="#00d700"),
         _p(SegmentType.CUSTOM, text="\u2192", separator=SeparatorStyle.NONE, color="#d75f00", bold=True),
-    ]),
-    "Original": SegmentsList(segments=[
-        _p(SegmentType.CUSTOM, separator=SeparatorStyle.DOUBLE_LEFT, revert=True),
-        _p(SegmentType.USERNAME, bgcolor="#00af00", separator=SeparatorStyle.DOUBLE_RIGHT),
-        _p(SegmentType.CUSTOM, text=r" \\t ", bgcolor="#0087ff", bold=True, separator=SeparatorStyle.DOUBLE_RIGHT),
-        _p(SegmentType.CUSTOM, text=r" \\w", bgcolor="#00afff", separator=SeparatorStyle.DOUBLE_RIGHT),
     ]),
     "Styled": SegmentsList(segments=[
         _p(SegmentType.CUSTOM, separator=SeparatorStyle.POWERLINE_LEFT, revert=True),
@@ -99,7 +99,7 @@ BUILTIN_PRESETS: dict[str, SegmentsList] = {
         _p(SegmentType.CUSTOM, separator=SeparatorStyle.NONE, text="\u256d\u2500", color="#d7af5f"),
         _p(SegmentType.CUSTOM, separator=SeparatorStyle.NONE, text=r" \\u@", dim=True),
         _p(SegmentType.CUSTOM, separator=SeparatorStyle.NONE, text=r"\\H", color="#87d700"),
-        _p(SegmentType.CRLF, separator=SeparatorStyle.NONE),
+        _p(SegmentType.CRLF,   separator=SeparatorStyle.NONE),
         _p(SegmentType.CUSTOM, separator=SeparatorStyle.NONE, text="\u2570\u2500", color="#d7af5f"),
         _p(SegmentType.CUSTOM, separator=SeparatorStyle.NONE, text=" \u27a4", color="#d7af5f"),
     ])
