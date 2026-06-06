@@ -26,7 +26,7 @@ class SegmentRow(Widget):
         seg = self._segment
         icon = SEGMENT_ICONS.get(seg.type, "")
         yield Label(icon or " ", classes="seg-icon")
-        yield Label(seg.label, classes="seg-label", id=f"lbl-{seg.id}")
+        yield Label(seg.label, classes="seg-label", id=f"lbl-{seg.id}", markup=False)
         with Horizontal():
             yield Button("▲", id=f"up-{seg.id}", classes="row-btn")
             yield Button("▼", id=f"dn-{seg.id}", classes="row-btn")

@@ -188,7 +188,10 @@ class SegmentsList:
         if ensure_ascii:
             sep_char = sep_char.encode("unicode_escape")\
                                .decode("ascii")
-
+        # if not content.strip():
+        #     # If we only have a separator, let the user choose its color
+        #     _prompt.append(_esc(sep_char, segment.style))
+        #     return _prompt
         tmp_style = segment.style.without_color
         if next_segment is None:
             if segment.revert:
