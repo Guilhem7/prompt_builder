@@ -1,4 +1,4 @@
-from .app import PromptBuilderApp
+from prompt_builder.app import PromptBuilderApp
 
 
 def main() -> None:

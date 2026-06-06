@@ -108,8 +108,13 @@ class SegmentConfigPanel(Widget):
         self.query_one("#config-empty-hint").display = False
         self.query_one("#config-fields").display = True
 
+        # Set segment active style
         self.query_one("#fg-picker", ColorPickerCompact).selected_color = seg.style.color
         self.query_one("#bg-picker", ColorPickerCompact).selected_color = seg.style.bgcolor
+        self.query_one("#bold", CustomCheckbox).value = seg.style.bold == True
+        self.query_one("#italic", CustomCheckbox).value = seg.style.italic == True
+        self.query_one("#underline", CustomCheckbox).value = seg.style.underline == True
+        self.query_one("#dim", CustomCheckbox).value = seg.style.dim == True
 
         self.query_one(SeparatorSelector).set_separator(seg.separator)
         self.query_one("#icon-toggle").value = seg.revert
