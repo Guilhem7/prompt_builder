@@ -140,6 +140,23 @@ class ZshFormatter(BaseFormatter):
         SegmentType.CWD:      "%~",
         SegmentType.CRLF:     r"\n",
     }
+    @classmethod
+    def esc(cls, text: str = None, style: Style = None):
+        if not text:
+            return ""
+        if style.without_color == Style.null():
+            zsh_style = ""
+            zsh_esc = ""
+            if style.color:
+                hex_color = style.color.get_truecolor().hex
+                zsh_style += f"%F{{{hex_color}}}"
+                zsh_esc += "%f"
+            if style.bgcolor:
+                hex_color = style.bgcolor.get_truecolor().hex
+                zsh_style += f"%K{{{hex_color}}}"
+                zsh_esc += "%k"
+            return f"{zsh_style}{text}{zsh_esc}"
+        return super().esc(text, style)
 
 class EchoFormatter(BaseFormatter):
     """Formats Segments for echo, reusable in functions
