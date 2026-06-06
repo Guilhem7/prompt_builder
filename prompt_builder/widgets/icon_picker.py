@@ -178,7 +178,7 @@ class IconSelectorModal(ModalScreen):
         with Vertical(id="wrapper"):
             yield IconPicker()
             with Horizontal(id="btn-modal"):
-                yield Button("Validate", id="btn-icon-validate")
+                yield Button("Validate", variant="primary", id="btn-icon-validate")
                 yield Button("Quit", id="btn-icon-dismiss")
 
     def on_key(self, event):

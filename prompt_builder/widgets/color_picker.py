@@ -69,6 +69,13 @@ class PaletteScreen(ModalScreen):
                 ("enter", "apply", "Save")
                ]
 
+    DEFAULT_CSS = """
+    #btn-choices {
+        min-width: 1fr;
+        align: center middle;
+    }
+    """
+
     def __init__(self, current) -> None:
         super().__init__()
         self._current = current
@@ -85,6 +92,16 @@ class PaletteScreen(ModalScreen):
                     id="palette-hex-input",
                 )
                 yield Static("\n\n\n", id="color-hex-input")
+            with Horizontal(id="btn-choices"):
+                yield Button("Apply", variant="primary", id="btn-color-apply")
+                yield Button("Cancel", id="btn-palette-screen-escape")
+
+    def on_button_pressed(self, event):
+        button_id = event.button.id
+        if button_id == "btn-color-apply":
+            self.action_apply()
+        elif button_id == "btn-palette-screen-escape":
+            self.dismiss()
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         self.action_apply()
