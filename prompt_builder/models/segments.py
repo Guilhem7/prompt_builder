@@ -25,34 +25,33 @@ class SegmentType(str, Enum):
     # General
     CUSTOM       = "custom"
     CRLF         = "\\n"
+    SEPARATOR    = "separator"
     USERNAME     = "username"
-    HOSTNAME     = "hostname"
     CWD          = "cwd"
 
 SEGMENT_ICONS: dict[SegmentType, str] = {
     SegmentType.CUSTOM:      "\ue029",
     SegmentType.CRLF:        "\\n",
     SegmentType.USERNAME:    "",
-    SegmentType.HOSTNAME:    "",
     SegmentType.CWD:         "",
+    SegmentType.SEPARATOR:   "",
 }
 
 SEGMENT_LABELS: dict[SegmentType, str] = {
     SegmentType.CUSTOM:      "Custom text",
     SegmentType.CRLF:        "\\n",
     SegmentType.USERNAME:    "Username",
-    SegmentType.HOSTNAME:    "Hostname",
     SegmentType.CWD:         "Directory",
+    SegmentType.SEPARATOR:   "Separator",
 }
 
 # Default (bg_color, fg_color) per type
 # Here ansi color of type 38;5; are used
-SEGMENT_DEFAULTS: dict[SegmentType, tuple[int, int]] = {
-    SegmentType.CUSTOM:         ('grey27', 'grey74'),
-    SegmentType.USERNAME:       ('blue_violet', 'grey100'),
-    SegmentType.HOSTNAME:       ('blue3', 'grey100'),
-    SegmentType.CWD:            ('dodger_blue2', 'grey100')
-}
+# SEGMENT_DEFAULTS: dict[SegmentType, tuple[int, int]] = {
+#     SegmentType.CUSTOM:         ('grey27', 'grey74'),
+#     SegmentType.USERNAME:       ('blue_violet', 'grey100'),
+#     SegmentType.CWD:            ('dodger_blue2', 'grey100')
+# }
 
 def _new_id() -> str:
     return uuid.uuid4().hex[:8]
@@ -94,7 +93,7 @@ class SegmentsList:
     """
     Main class for segment management
     """
-    NO_ICONS_SEGMENTS: Tuple[str] = ("CUSTOM", "CRLF")
+    NO_ICONS_SEGMENTS: Tuple[str] = ("CUSTOM", "CRLF", "SEPARATOR")
     NO_BG_SEGMENTS: Tuple[str] = ("CRLF")
     segments: List[Segment] = field(default_factory=list)
 
@@ -188,10 +187,12 @@ class SegmentsList:
         if ensure_ascii:
             sep_char = sep_char.encode("unicode_escape")\
                                .decode("ascii")
-        # if not content.strip():
-        #     # If we only have a separator, let the user choose its color
-        #     _prompt.append(_esc(sep_char, segment.style))
-        #     return _prompt
+
+        if segment.type is SegmentType.SEPARATOR:
+            # If we only have a separator, let the user choose its color
+            _prompt.append(_esc(sep_char, segment.style))
+            return _prompt
+
         tmp_style = segment.style.without_color
         if next_segment is None:
             if segment.revert:

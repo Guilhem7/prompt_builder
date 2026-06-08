@@ -54,7 +54,6 @@ class RichTextFormatter(Formatter):
     ENSURE_ASCII = False
     content_type = {
         SegmentType.USERNAME: os.getlogin(),
-        SegmentType.HOSTNAME: socket.gethostname(),
         SegmentType.CWD:      os.getcwd(),
         SegmentType.CRLF:     "\n",
     }
@@ -124,7 +123,6 @@ class Ps1Formatter(BaseFormatter):
     PROMPT_NAME = "PS1="
     content_type = {
         SegmentType.USERNAME: r"\u",
-        SegmentType.HOSTNAME: r"\h",
         SegmentType.CWD:      r"\w",
         SegmentType.CRLF:     r"\n",
     }
@@ -136,7 +134,6 @@ class ZshFormatter(BaseFormatter):
     PROMPT_NAME = "PROMPT="
     content_type = {
         SegmentType.USERNAME: "%n",
-        SegmentType.HOSTNAME: "%m",
         SegmentType.CWD:      "%~",
         SegmentType.CRLF:     r"\n",
     }
@@ -166,7 +163,6 @@ class EchoFormatter(BaseFormatter):
     PROMPT_NAME = "echo -e "
     content_type = {
         SegmentType.USERNAME: os.getlogin(),
-        SegmentType.HOSTNAME: socket.gethostname(),
         SegmentType.CWD:      os.getcwd(),
         SegmentType.CRLF:     r"\n",
     }

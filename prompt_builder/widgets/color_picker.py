@@ -75,7 +75,6 @@ class PaletteScreen(ModalScreen):
         align: center middle;
     }
     """
-
     def __init__(self, current) -> None:
         super().__init__()
         self._current = current

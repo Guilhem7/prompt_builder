@@ -8,16 +8,13 @@ from pathlib import Path
 from rich.text import Text
 from textual import on
 from textual.app import ComposeResult
-from textual.containers import Horizontal, Vertical
+from textual.containers import Horizontal, Vertical, Grid
 from textual.widget import Widget
-from textual.widgets import Button, Label, Select, Static
+from textual.widgets import Button, Label, Select, Static, Input
+from textual.screen import ModalScreen
 
 from prompt_builder.messages import SegmentsChanged
 from prompt_builder.models import SegmentsList, format_segments
-# from ..ps1_generator import (
-#     build_ansi_preview,
-#     build_for_shell
-# )
 
 _SHELL_OPTIONS: list[tuple[str, str]] = [
     ("Bash",  "bash"),
@@ -38,6 +35,61 @@ _DEFAULT_RC: dict[str, Path] = {
 _FAKE_HISTORY = [
     ("dim", "Last login: {} on pts/0".format(datetime.datetime.now().strftime("%a %b %d %H:%M:%S %Y"))),
 ]
+
+class SaveProfileScreen(ModalScreen):
+    """Screen with an input to save profile"""
+    DEFAULT_CSS = """
+    SaveProfileScreen {
+        align: center middle;
+    }
+
+    SaveProfileScreen Vertical {
+        width: 70;
+        min-height: 20;
+        height: auto;
+        border: solid $primary;
+        background: $surface;
+        padding: 1 2;
+        align: center middle;
+    }
+
+    SaveProfileScreen Vertical Input {
+        width: 40;
+    }
+
+    #btn-saveprofilescreen-container {
+        padding-top: 3;
+        align: center middle;
+        height: auto;
+    }
+    """
+    BINDINGS = [
+        ("escape", "dismiss", "quit"),
+    ]
+
+    def __init__(self, button_name: str = "Save"):
+        super().__init__()
+        self._button_name = button_name
+
+    def compose(self):
+        with Vertical():
+            yield Label("Enter the [b]profile[/b] name:")
+            yield Static()
+            yield Input(id="profile-input-name", placeholder="name")
+            with Horizontal(id="btn-saveprofilescreen-container"):
+                yield Button(self._button_name, variant="primary", id="btn-saveprofilescreen-profile")
+                yield Button("Cancel", id="btn-saveprofilescreen-cancel")
+
+    def on_button_pressed(self, event):
+        bid = event.button.id
+        if bid == "btn-saveprofilescreen-profile":
+            profile_name = self.query_one("#profile-input-name", Input).value
+            if not profile_name:
+                self.app.notify("[red]Input[/red] cannot be empty", severity="error")
+            else:
+                self.dismiss(profile_name)
+        elif bid == "btn-saveprofilescreen-cancel":
+            self.dismiss()
 
 class LivePreviewPanel(Widget):
     """Shows live prompt preview in a virtual terminal + export string."""
@@ -65,7 +117,6 @@ class LivePreviewPanel(Widget):
             yield Static("", id="vterm-history", markup=False)
             with Horizontal(id="vterm-prompt-row"):
                 yield Static("", id="ansi-preview", markup=False)
-                # yield Static("█", id="vterm-cursor")
         # Status bar
         with Horizontal(id="preview-meta"):
             yield Label("", id="validation-badge", classes="badge-valid")
@@ -77,6 +128,8 @@ class LivePreviewPanel(Widget):
         with Horizontal(id="preview-actions"):
             yield Button("Copy", id="btn-copy", variant="primary")
             yield Button("Save to RC", id="btn-save")
+            yield Button("Save as..", id="btn-save-as")
+            yield Button("Delete profile", id="btn-del-profile", variant="error")
 
     @on(Select.Changed, "#shell-select")
     def _on_shell_changed(self, event: Select.Changed) -> None:
@@ -123,6 +176,12 @@ class LivePreviewPanel(Widget):
             self._copy_to_clipboard()
         elif bid == "btn-save":
             self.save_to_rc()
+        elif bid == "btn-save-as":
+            self.app.push_screen(SaveProfileScreen("Save"),
+                                 callback=self.app.save_profile)
+        elif bid == "btn-del-profile":
+            self.app.push_screen(SaveProfileScreen("Delete"),
+                                 callback=self.app.delete_profile)
 
     def _copy_to_clipboard(self) -> None:
         try:

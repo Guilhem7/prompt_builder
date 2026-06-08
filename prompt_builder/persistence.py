@@ -5,6 +5,7 @@ Built-in presets are defined inline and never written to disk.
 """
 from __future__ import annotations
 
+import os
 import json
 from typing import Any
 from pathlib import Path
@@ -37,6 +38,7 @@ def segment_from_dict(d: dict[str, Any]) -> Segment:
     )
 
 def save_profile(name: str, segment_list, shell="bash") -> None:
+    name = os.path.basename(name)
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     data = [segment_to_dict(s) for s in segment_list.segments]
     datas = {_SHELL_KEY: shell.lower(), _SEGMENTS_KEY: data}
@@ -55,6 +57,7 @@ def load_profile(name: str):
         return None, None
 
 def delete_profile(name: str) -> bool:
+    name = os.path.basename(name)
     path = CONFIG_DIR / f"{name}.json"
     if path.exists():
         path.unlink()
@@ -82,13 +85,6 @@ BUILTIN_PRESETS: dict[str, SegmentsList] = {
     "Simple": SegmentsList(segments=[
         _p(SegmentType.CUSTOM, text=r"\\w ", separator=SeparatorStyle.NONE, color="#00d700"),
         _p(SegmentType.CUSTOM, text="\u2192", separator=SeparatorStyle.NONE, color="#d75f00", bold=True),
-    ]),
-    "Styled": SegmentsList(segments=[
-        _p(SegmentType.CUSTOM, separator=SeparatorStyle.POWERLINE_LEFT, revert=True),
-        _p(SegmentType.USERNAME, bgcolor="#af5f00"),
-        _p(SegmentType.CUSTOM, separator=SeparatorStyle.POWERLINE_THIN),
-        _p(SegmentType.CUSTOM, separator=SeparatorStyle.POWERLINE_LEFT, text=" ", revert=True),
-        _p(SegmentType.CUSTOM, text=r" \\w ", bgcolor="#d78700", bold=True),
     ]),
     "Sunny": SegmentsList(segments=[
         _p(SegmentType.CUSTOM, text=" \u03bb \\\\A ", italic=True, color="black", bgcolor="#f8b400"),

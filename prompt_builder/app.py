@@ -13,7 +13,10 @@ from .messages import (
 from prompt_builder.models import SegmentsList, Segment, SegmentType, make_segment
 from prompt_builder.persistence import (
     BUILTIN_PRESETS,
+    delete_profile,
     get_preset,
+    list_profiles,
+    load_profile,
     load_session,
     save_profile,
     save_session,
@@ -27,6 +30,15 @@ def get_default_segments() -> list[Segment]:
     for stype in [SegmentType.USERNAME, SegmentType.HOSTNAME, SegmentType.CWD]:
         defaults.add(make_segment(stype))
     return defaults
+
+def get_select_choices():
+    """Return the available choices for select"""
+    preset_options: list[tuple[str, str]] = [("-- Predefined --", "")]
+    preset_options += [(name, name) for name in BUILTIN_PRESETS]
+    preset_options += [("-- Saved profiles --", "")]
+    profiles = [(prof_name, prof_name) for prof_name in list_profiles()]
+    preset_options += profiles
+    return preset_options
 
 class PromptBuilderApp(App):
     """Interactive TUI for building a custom shell prompt."""
@@ -65,9 +77,7 @@ class PromptBuilderApp(App):
                     yield Select(seg_options, id="seg-type-select", value=SegmentType.USERNAME)
                     yield Button("＋ Add", id="btn-add", variant="primary")
                 with Horizontal(id="toolbar2"):
-                    preset_options: list[tuple[str, str]] = [("Preset…", "")]
-                    preset_options += [(name, name) for name in BUILTIN_PRESETS]
-                    yield Select(preset_options, id="preset-select", value="",
+                    yield Select(get_select_choices(), id="preset-select", value="",
                                  allow_blank=False)
                 with ScrollableContainer(id="segment-list"):
                     yield SegmentListPanel(self._segments)
@@ -79,11 +89,38 @@ class PromptBuilderApp(App):
     def on_mount(self) -> None:
         self.reload_segments(self._segments)
 
+    def save_profile(self, profile_name, notify=True):
+        try:
+            shell = self.query_one(LivePreviewPanel)._shell
+            save_profile(profile_name, self._segments, shell)
+            if notify:
+                self.notify("Profile has been [green]successully[/green] saved")
+        except Exception as exc:
+            self.notify(str(exc), severity="error")
+            pass
+        finally:
+            # Always reload select
+            self.reload_select()
+
+    def delete_profile(self, profile_name, notify=True):
+        try:
+            if delete_profile(profile_name):
+                self.notify("Profile has been [green]deleted[/green]")
+            else:
+                self.notify("Could not delete profile !", severity="error")
+        except Exception as exc:
+            self.notify(str(exc), severity="error")
+            pass
+        finally:
+            # Always reload select
+            self.reload_select()
+
     def autosave(self):
         try:
             shell = self.query_one(LivePreviewPanel)._shell
             save_session(self._segments, shell)
         except Exception as exc:
+            self.notify(str(exc), severity="error")
             pass
 
     def reload_segments(
@@ -101,6 +138,10 @@ class PromptBuilderApp(App):
 
         # Auto-save session on every change
         self.autosave()
+
+    def reload_select(self):
+        """Reload the select values"""
+        self.query_one("#preset-select", Select).set_options(get_select_choices())
 
     def update_segment_field(self, segment_id: str, field: str, value: object) -> None:
         """Mutate one field in-place (preserves segment IDs) then broadcast."""
@@ -138,7 +179,6 @@ class PromptBuilderApp(App):
     def on_select_changed(self, event) -> None:
         widget_id = event.select.id
         value = event.value
-
         if value is Select.BLANK or not value:
             return
 
@@ -146,10 +186,16 @@ class PromptBuilderApp(App):
             name = str(value)
             segments: list[Segment] | None = None
             segments = get_preset(name)
+            if not segments:
+                segments, shell = load_profile(name)
+                if shell:
+                    self.query_one(LivePreviewPanel).query_one("#shell-select").value = shell
+
             if segments:
                 self._segments = segments
                 self.reload_segments(True)
                 self._selected_id = None
+
             try:
                 self.query_one("#preset-select", Select).value = ""
             except Exception:

@@ -10,9 +10,6 @@ from prompt_builder.models.segments import (
 
 def make_segment(stype: SegmentType, **kwargs) -> Segment:
     """Create a Segment with type-appropriate default colors"""
-    # bg, fg = SEGMENT_DEFAULTS.get(stype, ("grey27", "grey100"))
-    # kwargs.setdefault("bg_color", bg)
-    # kwargs.setdefault("fg_color", fg)
     separator = kwargs.pop("separator", SeparatorStyle.POWERLINE_SOLID)
     text = kwargs.pop("text", "")
     revert = kwargs.pop("revert", False)
