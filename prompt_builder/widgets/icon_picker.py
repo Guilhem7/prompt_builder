@@ -6,28 +6,25 @@ from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widget import Widget
 from textual.message import Message
 from textual.screen import ModalScreen
-from textual.widgets import Input, Label, Static, Button, Static
+from textual.widgets import Input, Label, Static, Button, Static, TabbedContent, TabPane
 from prompt_builder.messages import IconSelected
 
-ICON_CATALOGUE: dict[str, list[tuple[str, str]]] = [
-    ("❯",  "chevron"),
-    ("➜",  "arrow"),
-    ("»",  "double chevron"),
-    ("›",  "single chevron"),
-    ("λ",  "lambda"),
-    ("→",  "right arrow"),
-    ("⟩",  "angle"),
-    ("▶",  "play"),
-    ("➤",  "tricked_arrow"),
-    ("⚡",  "bolt"),
-    ("★",  "star"),
-    ("◆",  "diamond"),
-    ("✦",  "sparkle"),
-    ("",  "shell"),
-    ("╭",  "left_up_angle"),
-    ("╰",  "left_bottom_angle"),
-    ('─',  "horizontal")
-]
+ICON_CATALOGUE = ("❯", "➜", "»", "›",
+                  "λ", "→", "⟩", "▶",
+                  "➤", "⚡", "★", "◆",
+                  "", "","╭","╰",'─')
+
+FILES_ICONS_CATALOGUE = (
+    "󰈔", "󰉋", "󰉖", "󰈙", "󰈤", "󰈫",
+)
+
+DEV_ICONS_CATALOGUE = (
+    "󰆍", "󰘦", "󰨞", "󱉶", "󰌠",
+    "󰌠", "󱘗", "󰌞", "󰌛",
+    "󰌝", "", "", "󰌟",
+    "󰟔", "", "", "󰬷",
+    "󰟓", "", ""
+)
 
 class IconCell(Widget):
     """A single tappable icon inside the grid."""
@@ -45,22 +42,20 @@ class IconCell(Widget):
     """
 
     class Chosen(Message):
-        def __init__(self, cell: "IconCell", icon: str, label: str) -> None:
+        def __init__(self, cell: "IconCell", icon: str) -> None:
             super().__init__()
             self.cell  = cell
             self.icon  = icon
-            self.label = label
 
-    def __init__(self, icon: str, label: str) -> None:
+    def __init__(self, icon: str) -> None:
         super().__init__()
         self._icon  = icon
-        self._label = label
 
     def render(self) -> str:
         return self._icon
 
     def on_click(self) -> None:
-        self.post_message(self.Chosen(self, self._icon, self._label))
+        self.post_message(self.Chosen(self, self._icon))
 
 class IconGrid(Widget):
     """Wrapping grid of cells; rebuilt whenever the filter changes."""
@@ -74,13 +69,13 @@ class IconGrid(Widget):
         grid-rows: 5;
     }
     """
-    def __init__(self, icons: list[tuple[str, str]]) -> None:
+    def __init__(self, icons: tuple[str]) -> None:
         super().__init__()
         self._all = icons
 
     def compose(self) -> ComposeResult:
-        for icon, label in self._all:
-            yield IconCell(icon, label)
+        for icon in self._all:
+            yield IconCell(icon)
 
 class IconPicker(Widget):
     """
@@ -88,6 +83,10 @@ class IconPicker(Widget):
     Emits  IconPicker.Selected(icon, label)  on choice.
     """
     DEFAULT_CSS = """
+    TabPane {
+        padding: 1 2;
+    }
+
     IconPicker {
         height: auto;
         layout: vertical;
@@ -126,7 +125,13 @@ class IconPicker(Widget):
         self._selected_icon = None
 
     def compose(self) -> ComposeResult:
-        yield IconGrid(ICON_CATALOGUE)
+        with TabbedContent():
+            with TabPane("Arrows"):
+                yield IconGrid(ICON_CATALOGUE)
+            with TabPane("Developer"):
+                yield IconGrid(DEV_ICONS_CATALOGUE)
+            with TabPane("Files"):
+                yield IconGrid(FILES_ICONS_CATALOGUE)
         yield Label("Write your unicode:")
         with Horizontal():
             yield Input(placeholder="\\u0000", id="unicode-input")
