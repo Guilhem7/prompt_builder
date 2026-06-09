@@ -16,6 +16,8 @@ ARROWS_ICON_CATALOGUE = ("❯", "➜", "»", "›",
 
 FILES_ICONS_CATALOGUE = (
     "󰈔", "󰉋", "󰉖", "󰈙", "󰈤", "󰈫",
+    "", "", "", "", "", "",
+    "", "", ""
 )
 
 DEV_ICONS_CATALOGUE = (
@@ -23,12 +25,12 @@ DEV_ICONS_CATALOGUE = (
     "󰌠", "󱘗", "󰌞", "󰌛",
     "󰌝", "", "", "󰌟",
     "󰟔", "", "", "󰬷",
-    "󰟓", "", ""
+    "󰟓", "", "", ""
 )
 
 ICON_CATALOGUES = {
     "Arrows":    ARROWS_ICON_CATALOGUE,
-    "Files":     FILES_ICONS_CATALOGUE,
+    "Utils":     FILES_ICONS_CATALOGUE,
     "Developer": DEV_ICONS_CATALOGUE
 }
 
