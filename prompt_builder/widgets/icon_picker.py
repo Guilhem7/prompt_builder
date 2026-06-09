@@ -9,7 +9,7 @@ from textual.screen import ModalScreen
 from textual.widgets import Input, Label, Static, Button, Static, TabbedContent, TabPane
 from prompt_builder.messages import IconSelected
 
-ICON_CATALOGUE = ("❯", "➜", "»", "›",
+ARROWS_ICON_CATALOGUE = ("❯", "➜", "»", "›",
                   "λ", "→", "⟩", "▶",
                   "➤", "⚡", "★", "◆",
                   "", "","╭","╰",'─')
@@ -25,6 +25,12 @@ DEV_ICONS_CATALOGUE = (
     "󰟔", "", "", "󰬷",
     "󰟓", "", ""
 )
+
+ICON_CATALOGUES = {
+    "Arrows":    ARROWS_ICON_CATALOGUE,
+    "Files":     FILES_ICONS_CATALOGUE,
+    "Developer": DEV_ICONS_CATALOGUE
+}
 
 class IconCell(Widget):
     """A single tappable icon inside the grid."""
@@ -123,15 +129,16 @@ class IconPicker(Widget):
     def __init__(self):
         super().__init__()
         self._selected_icon = None
+        self.grids = {
+            name: IconGrid(data)
+            for name, data in ICON_CATALOGUES.items()
+        }
 
     def compose(self) -> ComposeResult:
         with TabbedContent():
-            with TabPane("Arrows"):
-                yield IconGrid(ICON_CATALOGUE)
-            with TabPane("Developer"):
-                yield IconGrid(DEV_ICONS_CATALOGUE)
-            with TabPane("Files"):
-                yield IconGrid(FILES_ICONS_CATALOGUE)
+            for name, grid in self.grids.items():
+                with TabPane(name):
+                    yield grid
         yield Label("Write your unicode:")
         with Horizontal():
             yield Input(placeholder="\\u0000", id="unicode-input")
