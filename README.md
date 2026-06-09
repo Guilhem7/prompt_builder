@@ -4,6 +4,10 @@ Prompt Builder is a terminal application that allows you to visually design, pre
 
 Instead of manually editing `PS1` or `PROMPT` variables, Prompt Builder provides an interactive interface for assembling prompt components, customizing colors and styles, and previewing the final result in real time.
 
+## Thanks
+
+Thanks to @RaiseiX for the help on the project
+
 ## Demo
 
 ![Demo of the app](./images/demo.png)
