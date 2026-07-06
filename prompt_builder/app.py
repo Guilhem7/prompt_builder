@@ -27,8 +27,8 @@ from prompt_builder.widgets.segment_list_panel import SegmentListPanel
 
 def get_default_segments() -> list[Segment]:
     defaults = SegmentsList()
-    for stype in [SegmentType.USERNAME, SegmentType.HOSTNAME, SegmentType.CWD]:
-        defaults.add(make_segment(stype))
+    defaults.add(make_segment(SegmentType.USERNAME, color="white", bgcolor="color(20)"))
+    defaults.add(make_segment(SegmentType.CWD, color="white", bgcolor="color(235)"))
     return defaults
 
 def get_select_choices():

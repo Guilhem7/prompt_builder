@@ -47,7 +47,7 @@ def save_profile(name: str, segment_list, shell="bash") -> None:
 def load_profile(name: str):
     path = CONFIG_DIR / f"{name}.json"
     if not path.exists():
-        return None
+        return None, None
     try:
         datas = json.loads(path.read_text())
         data = datas[_SEGMENTS_KEY]
