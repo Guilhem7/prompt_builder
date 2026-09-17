@@ -20,6 +20,9 @@ authors = [
 [project.scripts]
 prompt-builder = "prompt_builder.__main__:main"
 
-[tool.setuptools]
-packages = ["prompt_builder"]
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+prompt_builder = ["*.tcss"]
 
